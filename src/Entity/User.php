@@ -1,5 +1,5 @@
 <?php
-
+//// TODO: ADD USER REFERENCE TO THE UPLOADED MEDIA OBJECT SO WE KNOW WHO"S THE OWNER AND WE CAN LOAD THEM EASY (PHOTOS) ON THE FRONTEND
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -36,12 +36,12 @@ class User implements UserInterface
     private $password;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Quiz", mappedBy="User_ID", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Quiz", mappedBy="User", orphanRemoval=true)
      */
     private $quizzes;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Report", mappedBy="User_ID")
+     * @ORM\OneToMany(targetEntity="App\Entity\Report", mappedBy="User")
      */
     private $reports;
 

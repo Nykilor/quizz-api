@@ -22,13 +22,13 @@ class Report
      * @ORM\ManyToOne(targetEntity="App\Entity\Quiz")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $Quiz_ID;
+    private $Quiz;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="reports")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $User_ID;
+    private $User;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -43,7 +43,7 @@ class Report
     /**
      * @ORM\Column(type="boolean")
      */
-    private $Resolved;
+    private $Resolved = false;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
@@ -55,26 +55,26 @@ class Report
         return $this->id;
     }
 
-    public function getQuizID(): ?Quiz
+    public function getQuiz(): ?Quiz
     {
-        return $this->Quiz_ID;
+        return $this->Quiz;
     }
 
-    public function setQuizID(?Quiz $Quiz_ID): self
+    public function setQuiz(?Quiz $Quiz): self
     {
-        $this->Quiz_ID = $Quiz_ID;
+        $this->Quiz = $Quiz;
 
         return $this;
     }
 
-    public function getUserID(): ?User
+    public function getUser(): ?User
     {
-        return $this->User_ID;
+        return $this->User;
     }
 
-    public function setUserID(?User $User_ID): self
+    public function setUser(?User $User): self
     {
-        $this->User_ID = $User_ID;
+        $this->User = $User;
 
         return $this;
     }

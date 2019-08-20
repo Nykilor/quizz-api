@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -24,12 +25,7 @@ class Question
      * @ORM\ManyToOne(targetEntity="App\Entity\Quiz", inversedBy="questions")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $Quiz_ID;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $Type;
+    private $Quiz;
 
     /**
      * @ORM\Column(type="text")
@@ -37,7 +33,11 @@ class Question
     private $Text;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var MediaObject|null
+     *
+     * @ORM\ManyToOne(targetEntity=MediaObject::class)
+     * @ORM\JoinColumn(nullable=true)
+     * @ApiProperty(iri="http://schema.org/image")
      */
     private $Photo;
 
@@ -47,7 +47,7 @@ class Question
     private $Chart = [];
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Answer", mappedBy="Question_ID", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Answer", mappedBy="Question", orphanRemoval=true)
      */
     private $answers;
 
@@ -61,26 +61,14 @@ class Question
         return $this->id;
     }
 
-    public function getQuizID(): ?Quiz
+    public function getQuiz(): ?Quiz
     {
-        return $this->Quiz_ID;
+        return $this->Quiz;
     }
 
-    public function setQuizID(?Quiz $Quiz_ID): self
+    public function setQuiz(?Quiz $Quiz): self
     {
-        $this->Quiz_ID = $Quiz_ID;
-
-        return $this;
-    }
-
-    public function getType(): ?int
-    {
-        return $this->Type;
-    }
-
-    public function setType(int $Type): self
-    {
-        $this->Type = $Type;
+        $this->Quiz = $Quiz;
 
         return $this;
     }
@@ -97,12 +85,12 @@ class Question
         return $this;
     }
 
-    public function getPhoto(): ?string
+    public function getPhoto(): ?MediaObject
     {
         return $this->Photo;
     }
 
-    public function setPhoto(?string $Photo): self
+    public function setPhoto(?MediaObject $Photo): self
     {
         $this->Photo = $Photo;
 

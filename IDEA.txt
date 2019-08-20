@@ -1,0 +1,115 @@
+Quizz
+
+Burza:
+- Tagi
+- Quizy - publiczne i prywatne (jak YouTube po linku)
+  - Pytania - Podzia³ na typy pytañ tj. z obrazkiem, bez obrazka, wykres
+  - Odpowiedzi - Podzia³ na odpowiedzi z obrazkiem lub bez
+- Zg³oszenia
+- Logowanie
+- Mo¿e GraphQL? 
+- Symfony Api Platform ( https://api-platform.com )
+
+Backend:
+Encje:
+  Quiz:
+    *ID [some kind of unique string]
+    *User_ID
+    *Title[varchar] 
+    Tags [longtext] (z # przed i po przecinku veryfikacja jakimœ regexem lub czymœ)
+    *Description [longtext]
+    *Type [int][def: 0] (0 wszystkie pytania widoczne, 1 pojedyncze pytanie z puli)
+    Photo [varchar 255] (obrazek quizu)
+    *Creation_date [date]
+    *Update_date [date]
+    *Is_public [bool][def: true](false - po linku, true na charcie)
+    *Disabled [bool][def: false] (false dzia³a, true nie dzia³a)
+    Disabling_reason [longtext]
+  Question:
+    *ID
+    *Quiz_ID
+    *Text [longtext]
+    Photo [varchar 255]
+    Chart [longtext]
+  Answer:
+    *ID
+    *Question_ID
+    *Text [longtext]
+    Photo [longtext]
+    *Is_answer [bool][def: false] (false nie, true tak)
+  User:
+    *ID
+    *Username [varchar 60]
+    *Roles [array]
+    *Password [?]
+  Report
+    *ID
+    *Quiz_ID
+    *User_ID
+    *Reason [varchar 255]
+    *Description [longtext]
+    *Resolved [bool][def: false] (true tak, false nie)
+    *Resolved_by [User => ID]
+
+Funkcjonalnoœæ:
+  Quiz:
+    Create:
+      - ROLE_USER
+    Read:
+      - Anyone
+    Update:
+      - Creator or ROLE_ADMIN
+      Disabling:
+      - ROLE_ADMIN, ROLE_MODERATOR (based on report)
+    Delete:
+      - Creator or ROLE_ADMIN
+  Question (cascade delete it if [Quiz] gets deleted):
+     Create:
+       - ROLE_USER that is the Creator
+     Read:
+       - Anyone
+     Update:
+       - Creator or ROLE_ADMIN
+     Delete:
+       - Creator or ROLE_ADMIN
+  Answer (cascade delete it if [Question] gets deleted):
+     Create:
+       - ROLE_USER that is the Creator
+     Read:
+       - Anyone
+     Update:
+       - Creator or ROLE_ADMIN
+     Delete:
+       - Creator or ROLE_ADMIN
+  User:
+     Create:
+       - ROLE_ADMIN
+       Register:
+         - Anyone
+     Read:
+       - ROLE_USER (Owner of User), ROLE_ADMIN
+     Update:
+       - ROLE_ADMIN
+       Reset_password:
+         - ROLE_USER (Owner of User), ROLE_ADMIN, ROLE_MODERATOR
+     Delete:
+       - ROLE_ADMIN
+       Forget_me:
+         - ROLE_USER (Owner of User)
+  Report:
+    Create:
+      - ROLE_USER
+    Read:
+      - ROLE_ADMIN, ROLE_MODERATOR
+    Update:
+      - ROLE_ADMIN
+      Resolve:
+        - ROLE_MODERATOR
+    Delete:
+      - ROLE_ADMIN
+
+Frontend Admin:
+React?
+
+Frontend Client:
+Vue?

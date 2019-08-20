@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -22,7 +23,7 @@ class Answer
      * @ORM\ManyToOne(targetEntity="App\Entity\Question", inversedBy="answers")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $Question_ID;
+    private $Question;
 
     /**
      * @ORM\Column(type="text")
@@ -30,33 +31,32 @@ class Answer
     private $Text;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $Type;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var MediaObject|null
+     *
+     * @ORM\ManyToOne(targetEntity=MediaObject::class)
+     * @ORM\JoinColumn(nullable=true)
+     * @ApiProperty(iri="http://schema.org/image")
      */
     private $Photo;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $Is_answer;
+    private $Is_answer = false;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getQuestionID(): ?Question
+    public function getQuestion(): ?Question
     {
-        return $this->Question_ID;
+        return $this->Question;
     }
 
-    public function setQuestionID(?Question $Question_ID): self
+    public function setQuestion(?Question $Question): self
     {
-        $this->Question_ID = $Question_ID;
+        $this->Question = $Question;
 
         return $this;
     }
@@ -73,24 +73,12 @@ class Answer
         return $this;
     }
 
-    public function getType(): ?int
-    {
-        return $this->Type;
-    }
-
-    public function setType(int $Type): self
-    {
-        $this->Type = $Type;
-
-        return $this;
-    }
-
-    public function getPhoto(): ?string
+    public function getPhoto(): ?MediaObject
     {
         return $this->Photo;
     }
 
-    public function setPhoto(?string $Photo): self
+    public function setPhoto(?MediaObject $Photo): self
     {
         $this->Photo = $Photo;
 

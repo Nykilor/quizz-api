@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use DateTime;
+
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -24,7 +27,7 @@ class Quiz
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="quizzes")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $User_ID;
+    private $User;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -44,10 +47,14 @@ class Quiz
     /**
      * @ORM\Column(type="integer")
      */
-    private $Type;
+    private $Type = 0;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var MediaObject|null
+     *
+     * @ORM\ManyToOne(targetEntity=MediaObject::class)
+     * @ORM\JoinColumn(nullable=true)
+     * @ApiProperty(iri="http://schema.org/image")
      */
     private $Photo;
 
@@ -64,12 +71,12 @@ class Quiz
     /**
      * @ORM\Column(type="boolean")
      */
-    private $Is_public;
+    private $Is_public = true;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $Disabled;
+    private $Disabled = false;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -77,13 +84,15 @@ class Quiz
     private $Disabling_reason;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Question", mappedBy="Quiz_ID", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Question", mappedBy="Quiz", orphanRemoval=true)
      */
     private $questions;
 
     public function __construct()
     {
         $this->questions = new ArrayCollection();
+        $date = new DateTime();
+        $this->Creation_date = $date;
     }
 
     public function getId(): ?int
@@ -91,14 +100,14 @@ class Quiz
         return $this->id;
     }
 
-    public function getUserID(): ?User
+    public function getUser(): ?User
     {
-        return $this->User_ID;
+        return $this->User;
     }
 
-    public function setUserID(?User $User_ID): self
+    public function setUser(?User $User): self
     {
-        $this->User_ID = $User_ID;
+        $this->User = $User;
 
         return $this;
     }
@@ -151,12 +160,12 @@ class Quiz
         return $this;
     }
 
-    public function getPhoto(): ?string
+    public function getPhoto(): ?MediaObject
     {
         return $this->Photo;
     }
 
-    public function setPhoto(?string $Photo): self
+    public function setPhoto(?MediaObject $Photo): self
     {
         $this->Photo = $Photo;
 
