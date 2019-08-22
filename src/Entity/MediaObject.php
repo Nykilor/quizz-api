@@ -3,6 +3,8 @@
 
 namespace App\Entity;
 
+use App\Entity\HasOwnerInterface;
+
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Controller\CreateMediaObjectAction;
@@ -47,7 +49,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * )
  * @Vich\Uploadable
  */
-class MediaObject
+class MediaObject implements HasOwnerInterface
 {
     /**
      * @var int|null
@@ -81,8 +83,26 @@ class MediaObject
      */
     public $filePath;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="mediaObjects")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): HasOwnerInterface
+    {
+        $this->user = $user;
+
+        return $this;
     }
 }

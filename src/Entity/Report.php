@@ -2,53 +2,119 @@
 
 namespace App\Entity;
 
+use DateTime;
+
+use App\Entity\HasOwnerInterface;
+
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
+
 /**
- * @ApiResource()
+ * @ApiResource(
+ *  normalizationContext={
+ *    "groups"={"report_read"}, "enable_max_depth"=true
+ *  },
+ *  attributes={
+ *    "access_control"="is_granted('ROLE_USER')",
+ *    "access_control_message"="Only registered users can access this endpoint."
+ *  },
+ *  itemOperations={
+ *    "GET"={
+ *      "access_control"="is_granted('ROLE_ADMIN') or object.owner == user"
+ *    },
+ *    "PUT"={
+ *      "access_control"="is_granted('ROLE_ADMIN')",
+ *      "denormalization_context"={
+ *        "groups"={"report_put"}
+ *      }
+ *    },
+ *    "DELETE"={
+ *      "access_control"="is_granted('ROLE_ADMIN')"
+ *    }
+ *  },
+ *  collectionOperations={
+ *    "GET"={
+ *      "access_control"="is_granted('ROLE_ADMIN')"
+ *    },
+ *    "POST"={
+ *      "denormalization_context"={
+ *        "groups"={"report_save"}
+ *      }
+ *    }
+ *  }
+ * )
  * @ORM\Entity(repositoryClass="App\Repository\ReportRepository")
  */
-class Report
+class Report implements HasOwnerInterface
 {
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"report_read"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Quiz")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"report_save", "report_read"})
+     * @MaxDepth(1)
      */
-    private $Quiz;
+    private $quiz;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="reports")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"report_save", "report_read"})
+     * @MaxDepth(1)
      */
-    private $User;
+    private $user;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"report_save", "report_read"})
      */
-    private $Reason;
+    private $reason;
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"report_save", "report_read"})
      */
-    private $Description;
+    private $description;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"report_read", "report_put"})
      */
-    private $Resolved = false;
+    private $resolved = false;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     * @Groups({"report_read", "report_put"})
+     * @MaxDepth(1)
      */
-    private $Resolved_by;
+    private $resolvedBy;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Groups({"report_read", "report_put"})
+     */
+    private $resolveResponse;
+
+    /**
+     * @ORM\Column(type="date")
+     * @Groups({"report_read"})
+     */
+    private $creationDate;
+
+    public function __construct()
+    {
+      $this->creationDate = new DateTime;
+    }
 
     public function getId(): ?int
     {
@@ -57,73 +123,90 @@ class Report
 
     public function getQuiz(): ?Quiz
     {
-        return $this->Quiz;
+        return $this->quiz;
     }
 
-    public function setQuiz(?Quiz $Quiz): self
+    public function setQuiz(?Quiz $quiz): self
     {
-        $this->Quiz = $Quiz;
+        $this->quiz = $quiz;
 
         return $this;
     }
 
     public function getUser(): ?User
     {
-        return $this->User;
+        return $this->user;
     }
 
-    public function setUser(?User $User): self
+    public function setUser(?User $user): HasOwnerInterface
     {
-        $this->User = $User;
+        $this->user = $user;
 
         return $this;
     }
 
     public function getReason(): ?string
     {
-        return $this->Reason;
+        return $this->reason;
     }
 
-    public function setReason(string $Reason): self
+    public function setReason(string $reason): self
     {
-        $this->Reason = $Reason;
+        $this->reason = $reason;
 
         return $this;
     }
 
     public function getDescription(): ?string
     {
-        return $this->Description;
+        return $this->description;
     }
 
-    public function setDescription(string $Description): self
+    public function setDescription(string $description): self
     {
-        $this->Description = $Description;
+        $this->description = $description;
 
         return $this;
     }
 
     public function getResolved(): ?bool
     {
-        return $this->Resolved;
+        return $this->resolved;
     }
 
-    public function setResolved(bool $Resolved): self
+    public function setResolved(bool $resolved): self
     {
-        $this->Resolved = $Resolved;
+        $this->resolved = $resolved;
 
         return $this;
     }
 
     public function getResolvedBy(): ?User
     {
-        return $this->Resolved_by;
+        return $this->resolvedBy;
     }
 
-    public function setResolvedBy(?User $Resolved_by): self
+    public function setResolvedBy(?User $resolvedBy): self
     {
-        $this->Resolved_by = $Resolved_by;
+        $this->resolvedBy = $resolvedBy;
 
         return $this;
+    }
+
+    public function getResolveResponse(): ?string
+    {
+        return $this->resolveResponse;
+    }
+
+    public function setResolveResponse(?string $resolveResponse): self
+    {
+        $this->resolveResponse = $resolveResponse;
+
+        return $this;
+    }
+
+    public function getCreationDate(): ?\DateTimeInterface
+    {
+        return $this->creationDate;
     }
 }

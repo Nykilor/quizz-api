@@ -8,8 +8,19 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Serializer\Annotation\Groups;
+
 /**
- * @ApiResource()
+ * @ApiResource(
+ *  collectionOperations={
+ *    "POST"
+ *  },
+ *  itemOperations={
+ *    "PUT",
+ *    "DELETE",
+ *    "GET"
+ *  }
+ * )
  * @ORM\Entity(repositoryClass="App\Repository\QuestionRepository")
  */
 class Question
@@ -18,6 +29,7 @@ class Question
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"quizzes_read_single"})
      */
     private $id;
 
@@ -25,12 +37,13 @@ class Question
      * @ORM\ManyToOne(targetEntity="App\Entity\Quiz", inversedBy="questions")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $Quiz;
+    private $quiz;
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"quizzes_read_single"})
      */
-    private $Text;
+    private $text;
 
     /**
      * @var MediaObject|null
@@ -38,16 +51,19 @@ class Question
      * @ORM\ManyToOne(targetEntity=MediaObject::class)
      * @ORM\JoinColumn(nullable=true)
      * @ApiProperty(iri="http://schema.org/image")
+     * @Groups({"quizzes_read_single"})
      */
-    private $Photo;
+    private $photo;
 
     /**
      * @ORM\Column(type="json", nullable=true)
+     * @Groups({"quizzes_read_single"})
      */
-    private $Chart = [];
+    private $chart = [];
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Answer", mappedBy="Question", orphanRemoval=true)
+     * @Groups({"quizzes_read_single"})
      */
     private $answers;
 
@@ -63,48 +79,48 @@ class Question
 
     public function getQuiz(): ?Quiz
     {
-        return $this->Quiz;
+        return $this->quiz;
     }
 
-    public function setQuiz(?Quiz $Quiz): self
+    public function setQuiz(?Quiz $quiz): self
     {
-        $this->Quiz = $Quiz;
+        $this->quiz = $quiz;
 
         return $this;
     }
 
     public function getText(): ?string
     {
-        return $this->Text;
+        return $this->text;
     }
 
-    public function setText(string $Text): self
+    public function setText(string $text): self
     {
-        $this->Text = $Text;
+        $this->text = $text;
 
         return $this;
     }
 
     public function getPhoto(): ?MediaObject
     {
-        return $this->Photo;
+        return $this->photo;
     }
 
-    public function setPhoto(?MediaObject $Photo): self
+    public function setPhoto(?MediaObject $photo): self
     {
-        $this->Photo = $Photo;
+        $this->photo = $photo;
 
         return $this;
     }
 
     public function getChart(): ?array
     {
-        return $this->Chart;
+        return $this->chart;
     }
 
-    public function setChart(?array $Chart): self
+    public function setChart(?array $chart): self
     {
-        $this->Chart = $Chart;
+        $this->chart = $chart;
 
         return $this;
     }

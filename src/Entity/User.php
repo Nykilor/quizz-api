@@ -1,11 +1,14 @@
 <?php
-//// TODO: ADD USER REFERENCE TO THE UPLOADED MEDIA OBJECT SO WE KNOW WHO"S THE OWNER AND WE CAN LOAD THEM EASY (PHOTOS) ON THE FRONTEND
 namespace App\Entity;
+
+use ApiPlatform\Core\Annotation\ApiSubresource;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -16,11 +19,13 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "report_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "report_read"})
      */
     private $username;
 
@@ -37,18 +42,27 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Quiz", mappedBy="User", orphanRemoval=true)
+     * @ApiSubresource
      */
     private $quizzes;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Report", mappedBy="User")
+     * @ApiSubresource
      */
     private $reports;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\MediaObject", mappedBy="User", orphanRemoval=true)
+     * @ApiSubresource
+     */
+    private $mediaObjects;
 
     public function __construct()
     {
         $this->quizzes = new ArrayCollection();
         $this->reports = new ArrayCollection();
+        $this->mediaObjects = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -180,6 +194,37 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($report->getUserID() === $this) {
                 $report->setUserID(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|MediaObject[]
+     */
+    public function getMediaObjects(): Collection
+    {
+        return $this->mediaObjects;
+    }
+
+    public function addMediaObject(MediaObject $mediaObject): self
+    {
+        if (!$this->mediaObjects->contains($mediaObject)) {
+            $this->mediaObjects[] = $mediaObject;
+            $mediaObject->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMediaObject(MediaObject $mediaObject): self
+    {
+        if ($this->mediaObjects->contains($mediaObject)) {
+            $this->mediaObjects->removeElement($mediaObject);
+            // set the owning side to null (unless already changed)
+            if ($mediaObject->getUser() === $this) {
+                $mediaObject->setUser(null);
             }
         }
 

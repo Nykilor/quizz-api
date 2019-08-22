@@ -56,7 +56,9 @@ Funkcjonalnoœæ:
     Create:
       - ROLE_USER
     Read:
-      - Anyone
+      - Anyone,
+      - Disabled visible only for admins,
+      - Collection shouldn't contain is_public === false
     Update:
       - Creator or ROLE_ADMIN
       Disabling:
@@ -113,3 +115,4 @@ React?
 
 Frontend Client:
 Vue?
+

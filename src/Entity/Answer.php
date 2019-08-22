@@ -6,8 +6,13 @@ use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Serializer\Annotation\Groups;
+
 /**
- * @ApiResource()
+ * @ApiResource(
+ *  collectionOperations={"POST"},
+ *  itemOperations={"PUT","DELETE", "GET"}
+ * )
  * @ORM\Entity(repositoryClass="App\Repository\AnswerRepository")
  */
 class Answer
@@ -16,6 +21,7 @@ class Answer
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"quizzes_read_single"})
      */
     private $id;
 
@@ -23,12 +29,13 @@ class Answer
      * @ORM\ManyToOne(targetEntity="App\Entity\Question", inversedBy="answers")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $Question;
+    private $question;
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"quizzes_read_single"})
      */
-    private $Text;
+    private $text;
 
     /**
      * @var MediaObject|null
@@ -36,13 +43,15 @@ class Answer
      * @ORM\ManyToOne(targetEntity=MediaObject::class)
      * @ORM\JoinColumn(nullable=true)
      * @ApiProperty(iri="http://schema.org/image")
+     * @Groups({"quizzes_read_single"})
      */
-    private $Photo;
+    private $photo;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"quizzes_read_single"})
      */
-    private $Is_answer = false;
+    private $is_answer = false;
 
     public function getId(): ?int
     {
@@ -51,48 +60,48 @@ class Answer
 
     public function getQuestion(): ?Question
     {
-        return $this->Question;
+        return $this->question;
     }
 
-    public function setQuestion(?Question $Question): self
+    public function setQuestion(?Question $question): self
     {
-        $this->Question = $Question;
+        $this->question = $question;
 
         return $this;
     }
 
     public function getText(): ?string
     {
-        return $this->Text;
+        return $this->text;
     }
 
-    public function setText(string $Text): self
+    public function setText(string $text): self
     {
-        $this->Text = $Text;
+        $this->text = $text;
 
         return $this;
     }
 
     public function getPhoto(): ?MediaObject
     {
-        return $this->Photo;
+        return $this->photo;
     }
 
-    public function setPhoto(?MediaObject $Photo): self
+    public function setPhoto(?MediaObject $photo): self
     {
-        $this->Photo = $Photo;
+        $this->photo = $photo;
 
         return $this;
     }
 
     public function getIsAnswer(): ?bool
     {
-        return $this->Is_answer;
+        return $this->is_answer;
     }
 
-    public function setIsAnswer(bool $Is_answer): self
+    public function setIsAnswer(bool $is_answer): self
     {
-        $this->Is_answer = $Is_answer;
+        $this->is_answer = $is_answer;
 
         return $this;
     }

@@ -32,15 +32,18 @@ class DatabaseDummyValuesFixtures extends Fixture
 
     public function load(ObjectManager $manager)
     {
-        $this->media = $this->getDummyMediaObjectEntity($manager);
         $user = $this->getDummyUserEntity($manager);
+        $this->media = $this->getDummyMediaObjectEntity($user);
         $quiz = $this->getDummyQuizEntity($manager, $user);
         $report = $this->getDummyReportEntity($manager, $quiz, $user);
         $question = $this->getDummyQuestionOfTypeZeroEntity($manager, $quiz);
         $answer1 = $this->getDummyAnswerEntity($manager, $question, true);
         $answer2 = $this->getDummyAnswerEntity($manager, $question, false);
 
-        foreach ([$user, $this->media, $quiz, $question, $answer1, $answer2] as $entity) {
+        $manager->persist($user);
+        $manager->flush();
+        
+        foreach ([$report, $this->media, $quiz, $question, $answer1, $answer2] as $entity) {
           $manager->persist($entity);
         }
 
@@ -51,7 +54,7 @@ class DatabaseDummyValuesFixtures extends Fixture
      * Returns an example MediaObject that is a PNG image.
      * @return MediaObject MediaObject Entity.
      */
-    public function getDummyMediaObjectEntity() : MediaObject
+    public function getDummyMediaObjectEntity(User $user) : MediaObject
     {
       $fs = new Filesystem();
       $media = new MediaObject();
@@ -70,7 +73,7 @@ class DatabaseDummyValuesFixtures extends Fixture
         null,
         true
       );
-
+      $media->setUser($user);
       $media->file = $uploadedFile;
 
       return $media;
