@@ -62,7 +62,7 @@ class Question
     private $chart = [];
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Answer", mappedBy="Question", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Answer", mappedBy="question", orphanRemoval=true)
      * @Groups({"quizzes_read_single"})
      */
     private $answers;

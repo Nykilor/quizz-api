@@ -15,6 +15,8 @@ use App\Controller\CreateQuizController;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 /**
  * @ApiResource(
  *  itemOperations={
@@ -86,6 +88,12 @@ class Quiz implements HasOwnerInterface
     /**
      * @ORM\Column(type="integer")
      * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz"})
+     * @Assert\Range(
+     *      min = 0,
+     *      max = 1,
+     *      minMessage = "The type can be either 0 or 1",
+     *      maxMessage = "The type can be either 0 or 1"
+     * )
      */
     private $type = 0;
 
@@ -119,16 +127,18 @@ class Quiz implements HasOwnerInterface
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"admin_read", "admin_write"})
      */
     private $disabled = false;
 
     /**
      * @ORM\Column(type="text", nullable=true)
+     * @Groups({"admin_read", "admin_write"})
      */
     private $disabling_reason;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Question", mappedBy="Quiz", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Question", mappedBy="quiz", orphanRemoval=true)
      * @Groups({"quizzes_read_single"})
      * @MaxDepth(3)
      * @ApiSubresource

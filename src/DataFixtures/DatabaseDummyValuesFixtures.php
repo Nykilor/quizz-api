@@ -22,7 +22,6 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class DatabaseDummyValuesFixtures extends Fixture
 {
-    public $media = null;
     private $encoder;
 
     public function __construct(UserPasswordEncoderInterface $encoder)
@@ -32,44 +31,84 @@ class DatabaseDummyValuesFixtures extends Fixture
 
     public function load(ObjectManager $manager)
     {
-        $user = $this->getDummyUserEntity($manager);
-        $this->media = $this->getDummyMediaObjectEntity($user);
-        $quiz = $this->getDummyQuizEntity($manager, $user);
-        $report = $this->getDummyReportEntity($manager, $quiz, $user);
-        $question = $this->getDummyQuestionOfTypeZeroEntity($manager, $quiz);
-        $answer1 = $this->getDummyAnswerEntity($manager, $question, true);
-        $answer2 = $this->getDummyAnswerEntity($manager, $question, false);
+        $admin_user = $this->getDummyUserEntity($manager, "root", true);
+        $normal_user_1 = $this->getDummyUserEntity($manager, "user1");
+        $normal_user_2 = $this->getDummyUserEntity($manager, "user2");
+        $persistence_array = [$admin_user, $normal_user_1, $normal_user_2];
 
-        $manager->persist($user);
-        $manager->flush();
-        
-        foreach ([$report, $this->media, $quiz, $question, $answer1, $answer2] as $entity) {
-          $manager->persist($entity);
-        }
+        $quiz1 = $this->getQuizWithQuestionsAnswers($manager, $admin_user);
+        array_unshift($quiz1, $this->getDummyMediaObjectEntity($admin_user, true));
+        $quiz1[1]->setPhoto($quiz1[0]);
 
-        $manager->flush();
+        $quiz2 = $this->getQuizWithQuestionsAnswers($manager, $normal_user_1);
+        array_unshift($quiz2, $this->getDummyMediaObjectEntity($normal_user_1));
+        $quiz2[1]->setPhoto($quiz2[0]);
+
+        $quiz3 = $this->getQuizWithQuestionsAnswers($manager, $normal_user_2);
+        array_unshift($quiz3, $this->getDummyMediaObjectEntity($normal_user_2));
+        $quiz3[1]->setPhoto($quiz3[0]);
+
+        array_push($quiz2, $this->getDummyReportEntity($manager, $quiz2[1], $normal_user_2));
+
+        $this->persistArray($manager, $persistence_array);
+        $this->persistArray($manager, $quiz1);
+        $this->persistArray($manager, $quiz2);
+        $this->persistArray($manager, $quiz3);
+    }
+
+    private function persistArray(ObjectManager $manager, array $entity_array) : void
+    {
+      foreach ($entity_array as $entity)
+      {
+        $manager->persist($entity);
+      }
+
+      $manager->flush();
+    }
+
+    /**
+     * Adds a dummy quizz with one question and two answers to the database.
+     * @param  ObjectManager $manager Doctrine Entity Manager.
+     * @param  User          $user    User Entity.
+     */
+    public function getQuizWithQuestionsAnswers(ObjectManager $manager, User $user) : Array
+    {
+      $quiz = $this->getDummyQuizEntity($manager, $user);
+      $question = $this->getDummyQuestionOfTypeZeroEntity($manager, $quiz);
+      $answer1 = $this->getDummyAnswerEntity($manager, $question, true);
+      $answer2 = $this->getDummyAnswerEntity($manager, $question, false);
+
+      return [$quiz, $question, $answer1, $answer2];
     }
 
     /**
      * Returns an example MediaObject that is a PNG image.
+     * @param  User        $user         User Entity.
+     * @param  bool        $reset_folder    Will delete media folder from public is true.
      * @return MediaObject MediaObject Entity.
      */
-    public function getDummyMediaObjectEntity(User $user) : MediaObject
+    public function getDummyMediaObjectEntity(User $user, bool $reset_folder = false) : MediaObject
     {
       $fs = new Filesystem();
       $media = new MediaObject();
       $src = __DIR__."\..\..\public";
-      $photoSrcFolder = $src."\\fixture";
+      $photoSrcFolder = $src."\\fixture\\";
       $mediaFolder = $src."\\media";
+      $random_number = rand(1,9999);
+      $new_file_name = "kitty".$random_number."PNG";
       //Remove the media folder we don't need the old photos
-      $fs->remove($mediaFolder);
+
+      if($reset_folder) {
+        $fs->remove($mediaFolder);
+      }
+
       //Make a copy of the orginal because the UploadedFile will remove it
-      $fs->copy($photoSrcFolder."\\kitty.PNG", $photoSrcFolder."\\kitty1.PNG", true);
+      $fs->copy($photoSrcFolder."\\kitty.PNG", $photoSrcFolder.$new_file_name, true);
       $uploadedFile = new UploadedFile(
-        $photoSrcFolder."\\kitty1.PNG",
+        $photoSrcFolder.$new_file_name,
         "kitty.PNG",
         "image\png",
-        filesize($src),
+        filesize($photoSrcFolder.$new_file_name),
         null,
         true
       );
@@ -81,14 +120,21 @@ class DatabaseDummyValuesFixtures extends Fixture
 
     /**
      * Returns an example User entity with Admin privilages (ROLE_ADMIN).
-     * @param  ObjectManager $manager Doctrine Entity Manager.
-     * @return User                   User Entity.
+     * @param  ObjectManager $manager  Doctrine Entity Manager.
+     * @param  string        $username The username.
+     * @param  bool       $is_admin True if should have admin privilage.
+     * @return User                    The User entity.
      */
-    public function getDummyUserEntity(ObjectManager $manager) : User
+    public function getDummyUserEntity(ObjectManager $manager, string $username, bool $is_admin = false) : User
     {
         $user = new User();
-        $user->setUsername("root");
-        $user->setRoles(["ROLE_ADMIN"]);
+        $user->setUsername($username);
+
+        if($is_admin) {
+          $user->setRoles(["ROLE_ADMIN"]);
+        }
+
+        $user->setEmail("user_".$username."@user.pl");
         $user->setPassword($this->encoder->encodePassword($user, "root"));
 
         return $user;
@@ -98,16 +144,21 @@ class DatabaseDummyValuesFixtures extends Fixture
      * Returns an example Quiz Entity.
      * @param  ObjectManager $manager Doctrine Entity Manager.
      * @param  User          $user    User Entity.
+     * @param  MediaObject|null   $media   A MediaObject or null
      * @return Quiz                   Quiz Entity.
      */
-    public function getDummyQuizEntity(ObjectManager $manager, User $user) : Quiz
+    public function getDummyQuizEntity(ObjectManager $manager, User $user, ?MediaObject $media = null) : Quiz
     {
         $quiz = new Quiz();
         $quiz->setUser($user);
         $quiz->setTags("#class, #test, #tag");
         $quiz->setType(0);
         $quiz->setTitle("Test Quiz!");
-        $quiz->setPhoto($this->media);
+
+        if(!is_null($media)) {
+          $quiz->setPhoto($media);
+        }
+
         $quiz->setIsPublic(true);
         $quiz->setUpdateDate(new DateTime());
         $quiz->setDescription("A test quiz from doctrine fixtures.");

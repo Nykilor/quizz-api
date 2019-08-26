@@ -10,105 +10,158 @@ Burza:
 - Mo¿e GraphQL? 
 - Symfony Api Platform ( https://api-platform.com )
 
+O - Owner field
+A - Admin field
+1 - Field visible for single entity request
+8 - Field visible for all entities request
+S - Self filling field
+* - Required field to fill
+
 Backend:
 Encje:
   Quiz:
-    *ID [some kind of unique string]
-    *User_ID
-    *Title[varchar] 
-    Tags [longtext] (z # przed i po przecinku veryfikacja jakimœ regexem lub czymœ)
-    *Description [longtext]
-    *Type [int][def: 0] (0 wszystkie pytania widoczne, 1 pojedyncze pytanie z puli)
-    Photo [varchar 255] (obrazek quizu)
-    *Creation_date [date]
-    *Update_date [date]
-    *Is_public [bool][def: true](false - po linku, true na charcie)
-    *Disabled [bool][def: false] (false dzia³a, true nie dzia³a)
-    Disabling_reason [longtext]
+    ID [some kind of unique string] - 18S*
+    User_ID - 18S*
+    Title[varchar] - 18*
+    Tags [longtext] (z # przed i po przecinku veryfikacja jakimœ regexem lub czymœ) - 18
+    Description [longtext] - 18*
+    Type [int][def: 0] (0 wszystkie pytania widoczne, 1 pojedyncze pytanie z puli) - 18*
+    Photo [varchar 255] (obrazek quizu) - 18
+    Creation_date [date] - 18S*
+    Update_date [date] - 18S*
+    Is_public [bool][def: true](false - po linku, true na charcie) - 18*
+    Disabled [bool][def: false] (false dzia³a, true nie dzia³a) - A18S*
+    Disabling_reason [longtext] - A18
   Question:
-    *ID
-    *Quiz_ID
-    *Text [longtext]
-    Photo [varchar 255]
-    Chart [longtext]
+    ID - 18S*
+    Quiz_ID - *
+    Text [longtext] - 18*
+    Photo [varchar 255] - 18
+    Chart [longtext] - 18
   Answer:
-    *ID
-    *Question_ID
-    *Text [longtext]
-    Photo [longtext]
-    *Is_answer [bool][def: false] (false nie, true tak)
+    ID - 18S*
+    Question_ID - *
+    Text [longtext] - 18*
+    Photo [longtext] - 18
+    Is_answer [bool][def: false] (false nie, true tak) - 18*
   User:
-    *ID
-    *Username [varchar 60]
-    *Roles [array]
-    *Password [?]
+    ID - 18S*
+    Username [varchar 60] - 18S*
+    Email  - OA18*
+    Roles [array] - A18S*
+    Password [Encoded] - *
   Report
-    *ID
-    *Quiz_ID
-    *User_ID
-    *Reason [varchar 255]
-    *Description [longtext]
-    *Resolved [bool][def: false] (true tak, false nie)
-    *Resolved_by [User => ID]
+    ID - OA18S*
+    Quiz_ID - OA18*
+    User_ID - OA18S*
+    Reason [varchar 255] - OA18*
+    Description [longtext] - OA18*
+    Resolved [bool][def: false] (true tak, false nie) - OA18S*
+    Resolved_by [User => ID] - OA1*
+    Resolve_response [longtext] - OA1*
 
 Funkcjonalnoœæ:
   Quiz:
     Create:
       - ROLE_USER
+      @Test if you get 401 about JWT if you're not logged in.
+      @Test if you get 201 if you send a valid request.
+      @Test if you get error with a not valid one.
     Read:
       - Anyone,
       - Disabled visible only for admins,
       - Collection shouldn't contain is_public === false
+      @Test if you get a 200 with list if you're not logged in.
+      @Test if you get a 200 with a single quizz.
     Update:
       - Creator or ROLE_ADMIN
+      @Test if you can update the Title of your created quizz.
+      @Test if you can update the Title of someone's quizz. 
       Disabling:
-      - ROLE_ADMIN, ROLE_MODERATOR (based on report)
+        - ROLE_ADMIN, ROLE_MODERATOR (based on report)
+        @Test if ROOT can disable it.
+        @Test if you get a valid error on trying to disable it while beign just an user.
     Delete:
       - Creator or ROLE_ADMIN
+      @Test if you can delete your quizz.
+      @Test if admin can delete users quizz.
   Question (cascade delete it if [Quiz] gets deleted):
      Create:
        - ROLE_USER that is the Creator
+       @Test if the user with a quiz can create an question for it.
+       @Test if admin gets an error 400? when he tries.
      Read:
        - Anyone
+       @Test if not logged can read it.
      Update:
        - Creator or ROLE_ADMIN
+       @Test if the creator can update it.
+       @Test if the admin can update it.
+       @Test if the other user not affilated with it get's an error.
      Delete:
        - Creator or ROLE_ADMIN
+       @Test if the creator can delete it.
+       @Test if the admin can delete it.
+       @Test if the other user not affilated with it get's an error.
   Answer (cascade delete it if [Question] gets deleted):
      Create:
        - ROLE_USER that is the Creator
+      @Test if you get 401 about JWT if you're not logged in.
+      @Test if you get 201 if you send a valid request.
+      @Test if you get error with a not valid one.
      Read:
        - Anyone
+       @Test if not logged can read it.
      Update:
        - Creator or ROLE_ADMIN
+       @Test if the creator can update it.
+       @Test if the admin can update it.
+       @Test if the other user not affilated with it get's an error.
      Delete:
        - Creator or ROLE_ADMIN
+       @Test if the creator can delete it.
+       @Test if the admin can delete it.
+       @Test if the other user not affilated with it get's an error.
   User:
      Create:
        - ROLE_ADMIN
-       Register:
-         - Anyone
+       @Test if not logged can do it.
      Read:
        - ROLE_USER (Owner of User), ROLE_ADMIN
+       @Test if the creator can read it.
+       @Test if not logged in can read it.
      Update:
        - ROLE_ADMIN
+       @Test if the admin can change change some info in the user Entity.
        Reset_password:
          - ROLE_USER (Owner of User), ROLE_ADMIN, ROLE_MODERATOR
+       @Test if you can request a reset link for the user's e-mail.
      Delete:
        - ROLE_ADMIN
+       @Test if admin can delete an user.
        Forget_me:
          - ROLE_USER (Owner of User)
+         @Test if user can delete himself.
+         @Test if he's getting an error when he sends a request to delete somebody else.
   Report:
     Create:
       - ROLE_USER
+      @Test if an user can create an report on his own quizz.
+      @Test if an user can create an report for somebodys quizz.
     Read:
       - ROLE_ADMIN, ROLE_MODERATOR
+      - Owner
+      @Test if the creator can read it.
+      @Test if the user gets an error while trying to read other reports than his own.
+      @Test if admin can read not his own report.
     Update:
       - ROLE_ADMIN
-      Resolve:
-        - ROLE_MODERATOR
+      @Test if admin can update the admin fields.
+      @Test if admin gets an error when he tries to update fields that are ment for the user to fill.
     Delete:
       - ROLE_ADMIN
+      @Test if the admin can delete an report.
+      @Test if user gets an error when he tries.
 
 Frontend Admin:
 React?

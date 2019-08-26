@@ -2,16 +2,22 @@
 
 namespace App\Tests;
 
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class QuizResourceApiTest extends WebTestCase
 {
-    public function testSomething()
-    {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/');
 
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'Hello World');
+    protected $client;
+
+
+    public function testRetriveQuizzesList()
+    {
+      $client = static::createClient();
+
+      $response = $client->request('GET', 'api/quizzes/3');
+
+      $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 }

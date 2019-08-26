@@ -25,3 +25,8 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    # https://api-platform.com/docs/core/serialization/#changing-the-serialization-context-dynamically
+    App\Serializer\AdminFieldAccessContextBuilder:
+        decorates: 'api_platform.serializer.context_builder'
+        arguments: [ '@App\Serializer\AdminFieldAccessContextBuilder.inner' ]
+        autoconfigure: false
