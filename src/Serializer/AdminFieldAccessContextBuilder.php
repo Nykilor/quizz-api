@@ -25,6 +25,7 @@ final class AdminFieldAccessContextBuilder implements SerializerContextBuilderIn
 
         if (isset($context['groups']) && $this->authorizationChecker->isGranted('ROLE_ADMIN')) {
           $context['groups'][] = $normalization ? 'admin_read' : 'admin_write';
+          var_dump(true);
         }
 
         return $context;

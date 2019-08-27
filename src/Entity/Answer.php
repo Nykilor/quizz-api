@@ -10,8 +10,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
- *  collectionOperations={"POST"},
- *  itemOperations={"PUT","DELETE", "GET"}
+ *  collectionOperations={"post"},
+ *  itemOperations={"put","delete", "get"}
  * )
  * @ORM\Entity(repositoryClass="App\Repository\AnswerRepository")
  */

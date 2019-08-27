@@ -13,12 +13,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ApiResource(
  *  collectionOperations={
- *    "POST"
+ *    "post"
  *  },
  *  itemOperations={
- *    "PUT",
- *    "DELETE",
- *    "GET"
+ *    "put",
+ *    "delete",
+ *    "get"
  *  }
  * )
  * @ORM\Entity(repositoryClass="App\Repository\QuestionRepository")

@@ -22,24 +22,24 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  *    "access_control_message"="Only registered users can access this endpoint."
  *  },
  *  itemOperations={
- *    "GET"={
+ *    "get"={
  *      "access_control"="is_granted('ROLE_ADMIN') or object.owner == user"
  *    },
- *    "PUT"={
+ *    "put"={
  *      "access_control"="is_granted('ROLE_ADMIN')",
  *      "denormalization_context"={
  *        "groups"={"report_put"}
  *      }
  *    },
- *    "DELETE"={
+ *    "delete"={
  *      "access_control"="is_granted('ROLE_ADMIN')"
  *    }
  *  },
  *  collectionOperations={
- *    "GET"={
+ *    "get"={
  *      "access_control"="is_granted('ROLE_ADMIN')"
  *    },
- *    "POST"={
+ *    "post"={
  *      "denormalization_context"={
  *        "groups"={"report_save"}
  *      }

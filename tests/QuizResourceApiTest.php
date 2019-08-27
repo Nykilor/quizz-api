@@ -11,12 +11,11 @@ class QuizResourceApiTest extends WebTestCase
 
     protected $client;
 
-
     public function testRetriveQuizzesList()
     {
       $client = static::createClient();
 
-      $response = $client->request('GET', 'api/quizzes/3');
+      $response = $client->request('GET', "api/quizzes");
 
       $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }

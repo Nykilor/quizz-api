@@ -20,16 +20,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ApiResource(
  *  itemOperations={
- *    "PUT",
- *    "DELETE",
- *    "GET"={
+ *    "put",
+ *    "delete",
+ *    "get"={
  *      "normalization_context"={
  *        "groups"={"quizzes_read_single"}, "enable_max_depth"=true
  *      },
  *    }
  *  },
  *  collectionOperations={
- *    "GET"={
+ *    "get"={
  *      "normalization_context"={
  *        "groups"={"quizzes_read_all"}, "enable_max_depth"=true
  *      }
