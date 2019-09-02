@@ -37,14 +37,17 @@ class DatabaseDummyValuesFixtures extends Fixture
         $persistence_array = [$admin_user, $normal_user_1, $normal_user_2];
 
         $quiz1 = $this->getQuizWithQuestionsAnswers($manager, $admin_user);
+        $quiz1[0]->setTitle("Test Admin Quiz!");
         array_unshift($quiz1, $this->getDummyMediaObjectEntity($admin_user, true));
         $quiz1[1]->setPhoto($quiz1[0]);
 
         $quiz2 = $this->getQuizWithQuestionsAnswers($manager, $normal_user_1);
+        $quiz2[0]->setTitle("Test User1 Quiz!");
         array_unshift($quiz2, $this->getDummyMediaObjectEntity($normal_user_1));
         $quiz2[1]->setPhoto($quiz2[0]);
 
         $quiz3 = $this->getQuizWithQuestionsAnswers($manager, $normal_user_2);
+        $quiz3[0]->setTitle("Test User2 Quiz!");
         array_unshift($quiz3, $this->getDummyMediaObjectEntity($normal_user_2));
         $quiz3[1]->setPhoto($quiz3[0]);
 

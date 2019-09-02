@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  *  },
  *  itemOperations={
  *    "get"={
- *      "access_control"="is_granted('ROLE_ADMIN') or object.owner == user"
+ *      "access_control"="is_granted('ROLE_ADMIN') or object.getUser() == user"
  *    },
  *    "put"={
  *      "access_control"="is_granted('ROLE_ADMIN')",

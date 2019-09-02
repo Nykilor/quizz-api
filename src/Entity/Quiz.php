@@ -11,7 +11,7 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Controller\CreateQuizController;
+use App\Controller\DeleteQuizController;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
@@ -19,15 +19,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
- *  itemOperations={
- *    "put",
- *    "delete",
- *    "get"={
- *      "normalization_context"={
- *        "groups"={"quizzes_read_single"}, "enable_max_depth"=true
- *      },
- *    }
- *  },
  *  collectionOperations={
  *    "get"={
  *      "normalization_context"={
@@ -45,6 +36,28 @@ use Symfony\Component\Validator\Constraints as Assert;
  *        "groups"={"post_quizz"}, "enable_max_depth"=true
  *      }
  *    }
+ *  },
+ *  itemOperations={
+ *    "get"={
+ *      "normalization_context"={
+ *        "groups"={"quizzes_read_single"}, "enable_max_depth"=true
+ *      },
+ *    },
+ *    "put_quizz"={
+ *      "method"="PUT",
+ *      "access_control"="is_granted('ROLE_ADMIN') or object.getUser() == user",
+ *      "normalization_context"={
+ *        "groups"={"quizzes_read_update"}
+ *      },
+ *      "denormalization_context"={
+ *        "groups"={"quizzes_write_update"}
+ *      }
+ *    },
+ *    "delete"={
+ *      "method"="DELETE",
+ *      "access_control"="is_granted('ROLE_ADMIN') or object.getUser() == user",
+ *      "controller"=DeleteQuizController::class
+ *    }
  *  }
  * )
  * @ORM\Entity(repositoryClass="App\Repository\QuizRepository")
@@ -55,7 +68,7 @@ class Quiz implements HasOwnerInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update"})
      */
     private $id;
 
@@ -69,25 +82,25 @@ class Quiz implements HasOwnerInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update"})
      */
     private $tags;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update"})
      * @Assert\Range(
      *      min = 0,
      *      max = 1,
@@ -103,25 +116,25 @@ class Quiz implements HasOwnerInterface
      * @ORM\ManyToOne(targetEntity=MediaObject::class)
      * @ORM\JoinColumn(nullable=true)
      * @ApiProperty(iri="http://schema.org/image")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update"})
      */
     private $photo;
 
     /**
      * @ORM\Column(type="date")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update"})
      */
     private $creation_date;
 
     /**
      * @ORM\Column(type="date")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update"})
      */
     private $update_date;
 
     /**
      * @ORM\Column(type="boolean")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update"})
      */
     private $is_public = true;
 
