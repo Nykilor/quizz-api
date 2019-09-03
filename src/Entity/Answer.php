@@ -10,8 +10,35 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
- *  collectionOperations={"post"},
- *  itemOperations={"put","delete", "get"}
+ *  collectionOperations={
+ *    "post"={
+ *      "method"="POST",
+ *      "access_control"="is_granted('ROLE_ADMIN') or object.getQuestion().getQuiz().getUser() == user",
+ *      "normalization_context"={
+ *        "groups"={"answer_read_create"}
+ *      },
+ *      "denormalization_context"={
+ *        "groups"={"answer_write_create"}
+ *      }
+ *    },
+ *  },
+ *  itemOperations={
+ *    "get",
+ *    "put"={
+ *      "method"="PUT",
+ *      "access_control"="is_granted('ROLE_ADMIN') or object.getQuestion().getQuiz().getUser() == user",
+ *      "normalization_context"={
+ *        "groups"={"answer_read_update"}
+ *      },
+ *      "denormalization_context"={
+ *        "groups"={"answer_write_update"}
+ *      }
+ *    },
+ *    "delete"={
+ *      "method"="DELETE",
+ *      "access_control"="is_granted('ROLE_ADMIN') or object.getQuestion().getQuiz().getUser() == user"
+ *    }
+ *  }
  * )
  * @ORM\Entity(repositoryClass="App\Repository\AnswerRepository")
  */
@@ -21,19 +48,20 @@ class Answer
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"quizzes_read_single"})
+     * @Groups({"quizzes_read_single", "answer_read_create"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Question", inversedBy="answers")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"answer_write_update", "answer_write_create"})
      */
     private $question;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"quizzes_read_single"})
+     * @Groups({"quizzes_read_single", "answer_write_update", "answer_read_create", "answer_write_create"})
      */
     private $text;
 
@@ -43,15 +71,15 @@ class Answer
      * @ORM\ManyToOne(targetEntity=MediaObject::class)
      * @ORM\JoinColumn(nullable=true)
      * @ApiProperty(iri="http://schema.org/image")
-     * @Groups({"quizzes_read_single"})
+     * @Groups({"quizzes_read_single", "answer_write_update", "answer_read_create", "answer_write_create"})
      */
     private $photo;
 
     /**
      * @ORM\Column(type="boolean")
-     * @Groups({"quizzes_read_single"})
+     * @Groups({"quizzes_read_single", "answer_write_update", "answer_read_create", "answer_write_create"})
      */
-    private $is_answer = false;
+    private $isAnswer = false;
 
     public function getId(): ?int
     {
@@ -96,12 +124,12 @@ class Answer
 
     public function getIsAnswer(): ?bool
     {
-        return $this->is_answer;
+        return $this->isAnswer;
     }
 
-    public function setIsAnswer(bool $is_answer): self
+    public function setIsAnswer(bool $isAnswer): self
     {
-        $this->is_answer = $is_answer;
+        $this->isAnswer = $isAnswer;
 
         return $this;
     }

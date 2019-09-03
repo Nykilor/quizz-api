@@ -13,12 +13,33 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ApiResource(
  *  collectionOperations={
- *    "post"
+ *    "post"={
+ *      "method"="POST",
+ *      "access_control"="is_granted('ROLE_ADMIN') or object.getQuiz().getUser() == user",
+ *      "normalization_context"={
+ *        "groups"={"questions_read_create"}
+ *      },
+ *      "denormalization_context"={
+ *        "groups"={"questions_write_create"}
+ *      }
+ *    }
  *  },
  *  itemOperations={
- *    "put",
- *    "delete",
- *    "get"
+ *    "get",
+ *    "put"={
+ *      "method"="PUT",
+ *      "access_control"="is_granted('ROLE_ADMIN') or object.getQuiz().getUser() == user",
+ *      "normalization_context"={
+ *        "groups"={"questions_read_update"}
+ *      },
+ *      "denormalization_context"={
+ *        "groups"={"questions_write_update"}
+ *      }
+ *    },
+ *    "delete"={
+ *      "method"="DELETE",
+ *      "access_control"="is_granted('ROLE_ADMIN') or object.getQuiz().getUser() == user"
+ *    }
  *  }
  * )
  * @ORM\Entity(repositoryClass="App\Repository\QuestionRepository")
@@ -29,19 +50,20 @@ class Question
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"quizzes_read_single"})
+     * @Groups({"quizzes_read_single", "questions_read_create"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Quiz", inversedBy="questions")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"questions_write_create", "questions_write_update"})
      */
     private $quiz;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"quizzes_read_single"})
+     * @Groups({"quizzes_read_single", "questions_read_create", "questions_write_create", "questions_write_update"})
      */
     private $text;
 
@@ -51,13 +73,13 @@ class Question
      * @ORM\ManyToOne(targetEntity=MediaObject::class)
      * @ORM\JoinColumn(nullable=true)
      * @ApiProperty(iri="http://schema.org/image")
-     * @Groups({"quizzes_read_single"})
+     * @Groups({"quizzes_read_single", "questions_read_create", "questions_write_create", "questions_write_update"})
      */
     private $photo;
 
     /**
      * @ORM\Column(type="json", nullable=true)
-     * @Groups({"quizzes_read_single"})
+     * @Groups({"quizzes_read_single", "questions_read_create", "questions_write_create", "questions_write_update"})
      */
     private $chart = [];
 

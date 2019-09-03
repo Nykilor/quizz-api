@@ -124,19 +124,19 @@ class Quiz implements HasOwnerInterface
      * @ORM\Column(type="date")
      * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update"})
      */
-    private $creation_date;
+    private $creationDate;
 
     /**
      * @ORM\Column(type="date")
      * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update"})
      */
-    private $update_date;
+    private $updateDate;
 
     /**
      * @ORM\Column(type="boolean")
      * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update"})
      */
-    private $is_public = true;
+    private $isPublic = true;
 
     /**
      * @ORM\Column(type="boolean")
@@ -148,7 +148,7 @@ class Quiz implements HasOwnerInterface
      * @ORM\Column(type="text", nullable=true)
      * @Groups({"admin_read", "admin_write"})
      */
-    private $disabling_reason;
+    private $disablingReason;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Question", mappedBy="quiz", orphanRemoval=true)
@@ -162,8 +162,8 @@ class Quiz implements HasOwnerInterface
     {
         $this->questions = new ArrayCollection();
         $date = new DateTime();
-        $this->creation_date = $date;
-        $this->update_date = $date;
+        $this->creationDate = $date;
+        $this->updateDate = $date;
     }
 
     public function getId(): ?int
@@ -245,29 +245,29 @@ class Quiz implements HasOwnerInterface
 
     public function getCreationDate(): ?\DateTimeInterface
     {
-        return $this->creation_date;
+        return $this->creationDate;
     }
 
     public function getUpdateDate(): ?\DateTimeInterface
     {
-        return $this->update_date;
+        return $this->updateDate;
     }
 
-    public function setUpdateDate(\DateTimeInterface $update_date): self
+    public function setUpdateDate(\DateTimeInterface $updateDate): self
     {
-        $this->update_date = $update_date;
+        $this->updateDate = $updateDate;
 
         return $this;
     }
 
     public function getIsPublic(): ?bool
     {
-        return $this->is_public;
+        return $this->isPublic;
     }
 
-    public function setIsPublic(bool $is_public): self
+    public function setIsPublic(bool $isPublic): self
     {
-        $this->is_public = $is_public;
+        $this->isPublic = $isPublic;
 
         return $this;
     }
@@ -286,12 +286,12 @@ class Quiz implements HasOwnerInterface
 
     public function getDisablingReason(): ?string
     {
-        return $this->disabling_reason;
+        return $this->disablingReason;
     }
 
-    public function setDisablingReason(?string $disabling_reason): self
+    public function setDisablingReason(?string $disablingReason): self
     {
-        $this->disabling_reason = $disabling_reason;
+        $this->disablingReason = $disablingReason;
 
         return $this;
     }

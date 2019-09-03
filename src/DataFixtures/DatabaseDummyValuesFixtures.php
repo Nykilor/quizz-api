@@ -38,6 +38,7 @@ class DatabaseDummyValuesFixtures extends Fixture
 
         $quiz1 = $this->getQuizWithQuestionsAnswers($manager, $admin_user);
         $quiz1[0]->setTitle("Test Admin Quiz!");
+
         array_unshift($quiz1, $this->getDummyMediaObjectEntity($admin_user, true));
         $quiz1[1]->setPhoto($quiz1[0]);
 
