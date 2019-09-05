@@ -30,3 +30,7 @@ services:
         decorates: 'api_platform.serializer.context_builder'
         arguments: [ '@App\Serializer\AdminFieldAccessContextBuilder.inner' ]
         autoconfigure: false
+    App\Doctrine\QuizFetchExtension:
+        tags:
+            - { name: api_platform.doctrine.orm.query_extension.collection }
+            - { name: api_platform.doctrine.orm.query_extension.item }

@@ -23,6 +23,10 @@ class ApiQuizTest extends WebTestCase
 
       $this->assertEquals(200, $response->getStatusCode());
       $this->assertEquals('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
+
+      $one_entry = $json["hydra:members"][0];
+      $this->assertArrayNotHasKey("disabled", $one_entry);
+      $this->assertArrayNotHasKey("disablingReason", $one_entry);
   }
 
   public function testRetriveSingleQuiz() : void

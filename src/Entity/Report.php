@@ -14,6 +14,11 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * @ApiResource(
+ * subresourceOperations={
+ *   "api_users_reports_get_subresource"= {
+ *     "access_control"="is_granted('ROLE_ADMIN') or (user != 'anon.' and user.getId() == id)"
+ *   }
+ *  },
  *  normalizationContext={
  *    "groups"={"report_read"}, "enable_max_depth"=true
  *  },

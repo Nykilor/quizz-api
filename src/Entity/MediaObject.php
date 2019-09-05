@@ -17,6 +17,11 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 /**
  * @ORM\Entity
  * @ApiResource(
+ *     subresourceOperations={
+ *       "api_users_media_objects_get_subresource"= {
+ *          "access_control"="is_granted('ROLE_ADMIN') or (user != 'anon.' and user.getId() == id)"
+ *       }
+ *     },
  *     iri="http://schema.org/MediaObject",
  *     normalizationContext={
  *         "groups"={"media_object_read"},
@@ -41,7 +46,9 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  *                 },
  *             },
  *         },
- *         "get",
+ *         "get"={
+ *          "access_control"="is_granted('ROLE_ADMIN')"
+ *         }
  *     },
  *     itemOperations={
  *         "get",

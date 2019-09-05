@@ -1,6 +1,10 @@
 <?php
 namespace App\Entity;
 
+use App\Controller\RegisterUserController;
+use App\Controller\DeleteUserController;
+
+use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -20,6 +24,36 @@ use Symfony\Component\Validator\Constraints as Assert;
  *  fields={"email"},
  *  message="This e-mail address is already registered."
  * )
+ * @ApiResource(
+ *  collectionOperations={
+ *    "get"={
+ *      "normalization_context"={
+ *        "groups"={"user_read_collection"}
+ *      }
+ *    },
+ *    "post"={
+ *      "denormalization_context"={
+ *        "groups"={"user_post_save"}
+ *      },
+ *      "normalization_context"={
+ *        "groups"={"user_post_read"}
+ *      },
+ *      "controller"=RegisterUserController::class,
+ *      "path"="/register"
+ *    }
+ *  },
+ *  itemOperations={
+ *    "get"={
+ *      "normalization_context"={
+ *        "groups"={"user_read_single"}
+ *      }
+ *    },
+ *    "delete"={
+ *      "access_control"="is_granted('ROLE_ADMIN') or object == user",
+ *      "controller"=DeleteUserController::class
+ *    },
+ *   }
+ * )
  */
 class User implements UserInterface
 {
@@ -27,42 +61,45 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "report_read"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "report_read", "user_read_collection", "user_read_single"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "report_read"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "report_read", "user_post_save", "user_post_read", "user_read_collection", "user_read_single"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="json")
+     * @Groups({"admin_write"})
      */
     private $roles = [];
 
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Groups({"user_post_save"})
      */
     private $password;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Quiz", mappedBy="User", orphanRemoval=true)
-     * @ApiSubresource
+     * @ORM\OneToMany(targetEntity="App\Entity\Quiz", mappedBy="user", orphanRemoval=true)
+     * @ApiSubresource(maxDepth=1)
+     * @Groups({"user_read_collection", "user_read_single"})
      */
     private $quizzes;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Report", mappedBy="User")
-     * @ApiSubresource
+     * @ORM\OneToMany(targetEntity="App\Entity\Report", mappedBy="user")
+     * @ApiSubresource(maxDepth=1)
      */
     private $reports;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\MediaObject", mappedBy="User", orphanRemoval=true)
-     * @ApiSubresource
+     * @ORM\OneToMany(targetEntity="App\Entity\MediaObject", mappedBy="user", orphanRemoval=true)
+     * @ApiSubresource(maxDepth=1)
      */
     private $mediaObjects;
 
@@ -71,6 +108,7 @@ class User implements UserInterface
      * @Assert\Email(
      *     message = "The email '{{ value }}' is not a valid email."
      * )
+     * @Groups({"user_post_save", "user_post_read", "admin_read"})
      */
     private $email;
 

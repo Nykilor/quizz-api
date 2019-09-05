@@ -6,10 +6,13 @@ namespace App\Controller;
 use App\Entity\Quiz;
 use App\Entity\Report;
 
+use App\Util\DeleteEntitiesByTrait;
+
 use Doctrine\Common\Persistence\ObjectManager;
 
 class DeleteQuizController
 {
+    use DeleteEntitiesByTrait;
     private $em;
 
     public function __construct(ObjectManager $em)
@@ -19,23 +22,7 @@ class DeleteQuizController
 
     public function __invoke(Quiz $data) : Quiz
     {
-        $quiz_id = $data->getId();
-
-        $report_repostiory = $this->em->getRepository(Report::class);
-
-        $reports = $report_repostiory->findBy(["quiz" => $quiz_id]);
-
-        foreach ($reports as $key => $entity)
-        {
-          $this->em->remove($entity);
-
-          if(($key+1 % 5) === 0)
-          {
-            $this->em->flush();
-          }
-        }
-
-        $this->em->flush();
+        $this->removeEntietiesBy(Report::class, ["quiz" => $data->getId()], $this->em);
 
         return $data;
     }

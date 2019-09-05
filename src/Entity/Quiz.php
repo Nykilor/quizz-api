@@ -68,7 +68,7 @@ class Quiz implements HasOwnerInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update", "user_read_collection", "user_read_single"})
      */
     private $id;
 
@@ -82,19 +82,19 @@ class Quiz implements HasOwnerInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update", "user_read_collection", "user_read_single"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update", "user_read_single"})
      */
     private $tags;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update", "user_read_single"})
      */
     private $description;
 
@@ -116,19 +116,19 @@ class Quiz implements HasOwnerInterface
      * @ORM\ManyToOne(targetEntity=MediaObject::class)
      * @ORM\JoinColumn(nullable=true)
      * @ApiProperty(iri="http://schema.org/image")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update", "user_read_single"})
      */
     private $photo;
 
     /**
      * @ORM\Column(type="date")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update", "user_read_single"})
      */
     private $creationDate;
 
     /**
      * @ORM\Column(type="date")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update", "user_read_single"})
      */
     private $updateDate;
 
