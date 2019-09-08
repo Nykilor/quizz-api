@@ -8,7 +8,6 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use App\Entity\Quiz;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Component\Routing\RequestContext;
 
@@ -19,9 +18,10 @@ final class QuizFetchExtension implements QueryCollectionExtensionInterface, Que
     private $security;
     private $request;
 
-    public function __construct(Security $security)
+    public function __construct(Security $security, RequestContext $request)
     {
         $this->security = $security;
+        $this->request = $request;
     }
 
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
@@ -39,15 +39,15 @@ final class QuizFetchExtension implements QueryCollectionExtensionInterface, Que
         if (Quiz::class !== $resourceClass && $this->security->isGranted('ROLE_ADMIN')) {
             return;
         }
-        $requestPath = $this->request->getPathInfo();
+
         $rootAlias = $queryBuilder->getRootAliases()[0];
-        //TODO Ogarnąć tak aby po wyslaniu zapytania
+        
         //Show only public and not disabled Quizzes for all, and private, public and disabled for the owner.
-        $queryBuilder->andWhere(sprintf('%s.isPublic = :public', $rootAlias));
-        $queryBuilder->setParameter('public', "1");
-        $queryBuilder->andWhere(sprintf('%s.disabled = :disabled', $rootAlias));
-        $queryBuilder->setParameter('disabled', "0");
-
-
+        if($this->request->getPathInfo() === "/api/quizzes") {
+          $queryBuilder->andWhere(sprintf('%s.isPublic = :public', $rootAlias));
+          $queryBuilder->setParameter('public', "1");
+          $queryBuilder->andWhere(sprintf('%s.disabled = :disabled', $rootAlias));
+          $queryBuilder->setParameter('disabled', "0");
+        }
     }
 }

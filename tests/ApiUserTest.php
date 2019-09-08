@@ -166,9 +166,54 @@ class ApiUserTest extends WebTestCase
       $this->assertEquals(403, $response->getStatusCode());
     }
     //quizzes
-    public function testRetriveUserQuizCollection() : void
+    public function testFailRetriveUserQuizzesCollection() : void
     {
       $response = $this->request("GET", $this->findOneIriBy(User::class, ["username" => "user2"])."/quizzes");
+      $this->assertEquals(401, $response->getStatusCode());
+    }
+
+    public function testRetriveUserQuizzesCollectionAsOwner() : void
+    {
+      $headers = [
+        "Authorization" => "Bearer ".$this->getAuthToken("user2", "root")
+      ];
+
+      $response = $this->request("GET", $this->findOneIriBy(User::class, ["username" => "user2"])."/quizzes", null, $headers);
+
+      $json = json_decode($response->getContent(), true);
+      $single_result = $json["hydra:member"][0];
+      $this->assertArrayHasKey("disabled", $single_result);
+      $this->assertArrayHasKey("isPublic", $single_result);
+      $this->assertArrayHasKey("disablingReason", $single_result);
+
       $this->assertEquals(200, $response->getStatusCode());
+
+    }
+
+    public function testRetriveUserQuizzesCollectionAsAdmin() : void
+    {
+      $headers = [
+        "Authorization" => "Bearer ".$this->getAuthToken("root", "root")
+      ];
+
+      $response = $this->request("GET", $this->findOneIriBy(User::class, ["username" => "user2"])."/quizzes", null, $headers);
+
+      $json = json_decode($response->getContent(), true);
+      $single_result = $json["hydra:member"][0];
+      $this->assertArrayHasKey("disabled", $single_result);
+      $this->assertArrayHasKey("isPublic", $single_result);
+      $this->assertArrayHasKey("disablingReason", $single_result);
+
+      $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testFailRetriveUserQuizzesCollectionAsOtherUser() : void
+    {
+      $headers = [
+        "Authorization" => "Bearer ".$this->getAuthToken("user1", "root")
+      ];
+
+      $response = $this->request("GET", $this->findOneIriBy(User::class, ["username" => "user2"])."/quizzes", null, $headers);
+      $this->assertEquals(403, $response->getStatusCode());
     }
 }

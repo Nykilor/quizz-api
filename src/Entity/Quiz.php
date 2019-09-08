@@ -19,6 +19,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
+ * subresourceOperations={
+ *   "api_users_quizzes_get_subresource"= {
+ *     "access_control"="is_granted('ROLE_ADMIN') or (user != 'anon.' and user.getId() == id)",
+ *     "normalization_context"={
+ *        "groups"={"subresource_user_quizzes_read_all"}, "enable_max_depth"=true
+ *     }
+ *   }
+ *  },
  *  collectionOperations={
  *    "get"={
  *      "normalization_context"={
@@ -68,7 +76,7 @@ class Quiz implements HasOwnerInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update", "user_read_collection", "user_read_single"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update", "user_read_collection", "user_read_single", "subresource_user_quizzes_read_all"})
      */
     private $id;
 
@@ -82,25 +90,25 @@ class Quiz implements HasOwnerInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update", "user_read_collection", "user_read_single"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update", "user_read_collection", "user_read_single", "subresource_user_quizzes_read_all"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update", "user_read_single"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update", "user_read_single", "subresource_user_quizzes_read_all"})
      */
     private $tags;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update", "user_read_single"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update", "user_read_single", "subresource_user_quizzes_read_all"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update", "subresource_user_quizzes_read_all"})
      * @Assert\Range(
      *      min = 0,
      *      max = 1,
@@ -116,37 +124,37 @@ class Quiz implements HasOwnerInterface
      * @ORM\ManyToOne(targetEntity=MediaObject::class)
      * @ORM\JoinColumn(nullable=true)
      * @ApiProperty(iri="http://schema.org/image")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update", "user_read_single"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update", "user_read_single", "subresource_user_quizzes_read_all"})
      */
     private $photo;
 
     /**
      * @ORM\Column(type="date")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update", "user_read_single"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update", "user_read_single", "subresource_user_quizzes_read_all"})
      */
     private $creationDate;
 
     /**
      * @ORM\Column(type="date")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update", "user_read_single"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "quizzes_read_update", "user_read_single", "subresource_user_quizzes_read_all"})
      */
     private $updateDate;
 
     /**
      * @ORM\Column(type="boolean")
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update"})
+     * @Groups({"quizzes_save_user_single", "post_quizz", "quizzes_read_update", "quizzes_write_update", "subresource_user_quizzes_read_all"})
      */
     private $isPublic = true;
 
     /**
      * @ORM\Column(type="boolean")
-     * @Groups({"admin_read", "admin_write"})
+     * @Groups({"admin_read", "admin_write", "owner_read"})
      */
     private $disabled = false;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"admin_read", "admin_write"})
+     * @Groups({"admin_read", "admin_write", "owner_read"})
      */
     private $disablingReason;
 
