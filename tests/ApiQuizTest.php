@@ -3,6 +3,7 @@
 namespace App\Tests;
 
 use App\Entity\Quiz;
+use App\Entity\User;
 
 use App\Util\ApiPlatformFunctionalTestTrait;
 
@@ -152,5 +153,54 @@ class ApiQuizTest extends WebTestCase
 
     $response = $this->request("DELETE", $this->findOneIriBy(Quiz::class, ["title" => "Test User1 Quiz!"]), null, $headers);
     $this->assertEquals(204, $response->getStatusCode());
+  }
+
+  public function testRetriveQuizWithTitleParameter() : void
+  {
+    $response = $this->request("GET", "/api/quizzes?title=Test");
+    $this->assertEquals(200, $response->getStatusCode());
+
+    $json = json_decode($response->getContent(), true);
+    $this->assertEquals(3, $json["hydra:totalItems"]);
+  }
+
+  public function testRetriveQuizWithTagsParameter() : void
+  {
+    $response = $this->request("GET", "/api/quizzes?tags=test");
+    $this->assertEquals(200, $response->getStatusCode());
+
+    $json = json_decode($response->getContent(), true);
+    $this->assertEquals(3, $json["hydra:totalItems"]);
+  }
+
+  public function testRetriveQuizWithDescriptionParameter() : void
+  {
+    $response = $this->request("GET", "/api/quizzes?tags=test");
+    $this->assertEquals(200, $response->getStatusCode());
+
+    $json = json_decode($response->getContent(), true);
+    $this->assertEquals(3, $json["hydra:totalItems"]);
+  }
+
+  public function testRetriveQuizWithUserParameter() : void
+  {
+    $response = $this->request("GET", "/api/quizzes?user=".$this->findOneIriBy(User::class, ["username" => "user1"]));
+    $this->assertEquals(200, $response->getStatusCode());
+
+    $json = json_decode($response->getContent(), true);
+    $this->assertEquals(1, $json["hydra:totalItems"]);
+  }
+
+  public function testRetriveQuizWithUserParameterAsQuizOwner() : void
+  {
+    $headers = [
+      "Authorization" => "Bearer ".$this->getAuthToken("user1", "root")
+    ];
+
+    $response = $this->request("GET", "/api/quizzes?user=".$this->findOneIriBy(User::class, ["username" => "user1"]), null, $headers);
+    $this->assertEquals(200, $response->getStatusCode());
+
+    $json = json_decode($response->getContent(), true);
+    $this->assertEquals(1, $json["hydra:totalItems"]);
   }
 }

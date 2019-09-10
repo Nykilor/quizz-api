@@ -1,6 +1,13 @@
 api_platform:
     mapping:
         paths: ['%kernel.project_dir%/src/Entity']
+    title: "Quizz"
+    description: "A Quizz app backend https://github.com/Nykilor/quizz-api"
+    version: "1.0"
+    show_webby: false
+    collection:
+        pagination:
+            client_items_per_page: true
     swagger:
          api_keys:
              apiKey:

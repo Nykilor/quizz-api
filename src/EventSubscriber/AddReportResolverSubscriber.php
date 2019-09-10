@@ -40,12 +40,9 @@ final class AddReportResolverSubscriber implements EventSubscriberInterface
         $method = $event->getRequest()->getMethod();
 
         if (!$entity instanceof Report || Request::METHOD_PUT !== $method) {
-
-            // Only handle Article entities (Event is called on any Api entity)
             return;
         }
 
-        // maybe these extra null checks are not even needed
         $token = $this->tokenStorage->getToken();
         if (!$token) {
             return;
@@ -58,7 +55,7 @@ final class AddReportResolverSubscriber implements EventSubscriberInterface
         }
 
 
-        // Attach the user to the not yet persisted Article
+        $entity->setResolved(true);
         $entity->setResolvedBy($resolver);
 
     }

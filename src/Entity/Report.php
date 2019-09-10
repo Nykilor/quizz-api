@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use DateTime;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
+
 use App\Entity\HasOwnerInterface;
 
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -11,6 +13,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
+
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 
 /**
  * @ApiResource(
@@ -30,11 +35,13 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  *    "get"={
  *      "access_control"="is_granted('ROLE_ADMIN') or object.getUser() == user"
  *    },
- *    "put"={
+ *    "resolve_report"={
+ *      "method"="PUT",
  *      "access_control"="is_granted('ROLE_ADMIN')",
  *      "denormalization_context"={
  *        "groups"={"report_put"}
- *      }
+ *      },
+ *      "path"="/reports/{id}/resolve"
  *    },
  *    "delete"={
  *      "access_control"="is_granted('ROLE_ADMIN')"
@@ -51,6 +58,8 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  *    }
  *  }
  * )
+ * @ApiFilter(SearchFilter::class, properties={"reason": "partial", "description": "partial", "user": "exact", "quiz": "exact"})
+ * @ApiFilter(BooleanFilter::class, properties={"resolved"})
  * @ORM\Entity(repositoryClass="App\Repository\ReportRepository")
  */
 class Report implements HasOwnerInterface
@@ -74,7 +83,7 @@ class Report implements HasOwnerInterface
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="reports")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"report_save", "report_read"})
+     * @Groups({"report_read"})
      * @MaxDepth(1)
      */
     private $user;
@@ -93,13 +102,13 @@ class Report implements HasOwnerInterface
 
     /**
      * @ORM\Column(type="boolean")
-     * @Groups({"report_read", "report_put"})
+     * @Groups({"report_read"})
      */
     private $resolved = false;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
-     * @Groups({"report_read", "report_put"})
+     * @Groups({"report_read"})
      * @MaxDepth(1)
      */
     private $resolvedBy;

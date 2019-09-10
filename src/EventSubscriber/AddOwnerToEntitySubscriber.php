@@ -41,12 +41,9 @@ final class AddOwnerToEntitySubscriber implements EventSubscriberInterface
         $method = $event->getRequest()->getMethod();
 
         if (!$entity instanceof HasOwnerInterface || Request::METHOD_POST !== $method) {
-
-            // Only handle Article entities (Event is called on any Api entity)
             return;
         }
 
-        // maybe these extra null checks are not even needed
         $token = $this->tokenStorage->getToken();
         if (!$token) {
             return;

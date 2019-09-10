@@ -31,7 +31,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *        "groups"={"user_read_collection"}
  *      }
  *    },
- *    "post"={
+ *    "register"={
+ *      "method"="POST",
  *      "denormalization_context"={
  *        "groups"={"user_post_save"}
  *      },
@@ -40,6 +41,68 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      },
  *      "controller"=RegisterUserController::class,
  *      "path"="/register"
+ *    },
+ *    "login"={
+ *      "path"="/login",
+ *      "method"="POST",
+ *      "swagger_context"={
+ *        "summary"="Performs a login attempt, returning a valid token on success",
+ *        "parameters"={
+ *          {
+ *            "in": "body",
+ *            "schema": {
+ *              "type": "object",
+ *              "description": "",
+ *              "properties": {
+ *                "username": {
+ *                    "type": "string"
+ *                },
+ *                "password": {
+ *                    "type": "string"
+ *                },
+ *                "email": {
+ *                    "type": "string"
+ *                }
+ *              }
+ *            }
+ *          }
+ *        },
+ *        "responses"={
+ *          200: {
+ *            "description": "Successful login attempt, returning a new token",
+ *            "schema": {
+ *              "type": "object",
+ *              "properties": {
+ *                "token": {
+ *                  "type": "string"
+ *                }
+ *              }
+ *            }
+ *          },
+ *          401: {
+ *            "description": "Bad credentials",
+ *            "schema": {
+ *              "type": "object",
+ *              "properties": {
+ *                "code": {
+ *                  "type": "integer",
+ *                  "example": 401
+ *                },
+ *                "message": {
+ *                  "type": "string",
+ *                  "example": "Bad credentials"
+ *                }
+ *              }
+ *            }
+ *          }
+ *        },
+ *        "consumes"={
+ *          "application/json"
+ *        },
+ *        "produces"={
+ *          "application/json"
+ *        }
+ *      }
  *    }
  *  },
  *  itemOperations={

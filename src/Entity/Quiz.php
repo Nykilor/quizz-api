@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use DateTime;
+use ApiPlatform\Core\Annotation\ApiFilter;
+
 use App\Entity\HasOwnerInterface;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
@@ -14,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Controller\DeleteQuizController;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
-
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -68,6 +70,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *    }
  *  }
  * )
+ * @ApiFilter(SearchFilter::class, properties={"title": "partial", "tags": "partial", "description": "partial", "user": "exact"})
  * @ORM\Entity(repositoryClass="App\Repository\QuizRepository")
  */
 class Quiz implements HasOwnerInterface
