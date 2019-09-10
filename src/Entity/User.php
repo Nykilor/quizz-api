@@ -3,6 +3,7 @@ namespace App\Entity;
 
 use App\Controller\RegisterUserController;
 use App\Controller\DeleteUserController;
+use App\Controller\BanUserController;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
@@ -41,6 +42,38 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      },
  *      "controller"=RegisterUserController::class,
  *      "path"="/register"
+ *    },
+ *    "ban_user"={
+ *      "method"="POST",
+ *      "access_control"="is_granted('ROLE_ADMIN')",
+ *      "denormalization_context"={
+ *        "groups"={"user_ban_save"}
+ *      },
+ *      "path"="/users/{id}/ban",
+ *      "controller"=BanUserController::class,
+ *      "read"=false,
+ *      "swagger_context"={
+ *        "parameters"={
+ *          {
+ *            "in": "path",
+ *            "name": "id",
+ *            "required": true
+ *          },
+ *          {
+ *            "in": "body",
+ *            "schema": {
+ *              "type": "object",
+ *              "description": "",
+ *              "properties": {
+ *                "bannedTill": {
+ *                  "type": "string",
+ *                  "format": "date"
+ *                }
+ *              }
+ *            }
+ *          }
+ *        }
+ *      }
  *    },
  *    "login"={
  *      "path"="/login",
@@ -174,6 +207,12 @@ class User implements UserInterface
      * @Groups({"user_post_save", "user_post_read", "admin_read"})
      */
     private $email;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"user_ban_save"})
+     */
+    private $bannedTill;
 
     public function __construct()
     {
@@ -356,6 +395,18 @@ class User implements UserInterface
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getBannedTill(): ?\DateTimeInterface
+    {
+        return $this->bannedTill;
+    }
+
+    public function setBannedTill(?\DateTimeInterface $bannedTill): self
+    {
+        $this->bannedTill = $bannedTill;
 
         return $this;
     }
