@@ -216,4 +216,29 @@ class ApiUserTest extends WebTestCase
       $response = $this->request("GET", $this->findOneIriBy(User::class, ["username" => "user2"])."/quizzes", null, $headers);
       $this->assertEquals(403, $response->getStatusCode());
     }
+
+    public function testBanUser() : void
+    {
+      $headers = [
+        "Authorization" => "Bearer ".$this->getAuthToken()
+      ];
+
+      $data = [
+        "bannedTill" => "2030-09-11",
+        "banReason" => "You're a twat"
+      ];
+
+      $response = $this->request("PUT", $this->findOneIriBy(User::class, ["username" => "user2"])."/ban", $data, $headers);
+      $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testLoginAsBannedUser() : void
+    {
+      $response = $this->request('POST', '/api/login', [
+        "username" => "user3",
+        "password" => "root"
+      ]);
+
+      $this->assertEquals(403, $response->getStatusCode());
+    }
 }

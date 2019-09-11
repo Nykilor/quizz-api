@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\MediaObject;
+use App\Exception\UserIsBannedException;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 

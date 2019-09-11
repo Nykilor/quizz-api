@@ -1,6 +1,8 @@
 <?php
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
+
 use App\Controller\RegisterUserController;
 use App\Controller\DeleteUserController;
 use App\Controller\BanUserController;
@@ -42,38 +44,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      },
  *      "controller"=RegisterUserController::class,
  *      "path"="/register"
- *    },
- *    "ban_user"={
- *      "method"="POST",
- *      "access_control"="is_granted('ROLE_ADMIN')",
- *      "denormalization_context"={
- *        "groups"={"user_ban_save"}
- *      },
- *      "path"="/users/{id}/ban",
- *      "controller"=BanUserController::class,
- *      "read"=false,
- *      "swagger_context"={
- *        "parameters"={
- *          {
- *            "in": "path",
- *            "name": "id",
- *            "required": true
- *          },
- *          {
- *            "in": "body",
- *            "schema": {
- *              "type": "object",
- *              "description": "",
- *              "properties": {
- *                "bannedTill": {
- *                  "type": "string",
- *                  "format": "date"
- *                }
- *              }
- *            }
- *          }
- *        }
- *      }
  *    },
  *    "login"={
  *      "path"="/login",
@@ -144,6 +114,26 @@ use Symfony\Component\Validator\Constraints as Assert;
  *        "groups"={"user_read_single"}
  *      }
  *    },
+ *    "ban_user"={
+ *      "method"="PUT",
+ *      "access_control"="is_granted('ROLE_ADMIN')",
+ *      "denormalization_context"={
+ *        "groups"={"user_ban_put_save"}
+ *      },
+ *      "normalization_context"={
+ *        "groups"={"user_ban_put_read"}
+ *      },
+ *      "path"="/users/{id}/ban",
+ *      "swagger_context"={
+ *        "parameters"={
+ *          {
+ *            "in": "path",
+ *            "name": "id",
+ *            "required": true
+ *          },
+ *        }
+ *      }
+ *    },
  *    "delete"={
  *      "access_control"="is_granted('ROLE_ADMIN') or object == user",
  *      "controller"=DeleteUserController::class
@@ -163,7 +153,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "report_read", "user_post_save", "user_post_read", "user_read_collection", "user_read_single"})
+     * @Groups({"quizzes_read_all", "quizzes_read_single", "post_quizz", "report_read", "user_post_save", "user_post_read", "user_read_collection", "user_read_single", "user_ban_put_read"})
      */
     private $username;
 
@@ -210,9 +200,15 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"user_ban_save"})
+     * @Groups({"user_ban_put_save", "user_ban_put_read", "admin_read"})
      */
     private $bannedTill;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"user_ban_put_save", "user_ban_put_read", "admin_read"})
+     */
+    private $banReason;
 
     public function __construct()
     {
@@ -407,6 +403,18 @@ class User implements UserInterface
     public function setBannedTill(?\DateTimeInterface $bannedTill): self
     {
         $this->bannedTill = $bannedTill;
+
+        return $this;
+    }
+
+    public function getBanReason(): ?string
+    {
+        return $this->banReason;
+    }
+
+    public function setBanReason(?string $banReason): self
+    {
+        $this->banReason = $banReason;
 
         return $this;
     }
