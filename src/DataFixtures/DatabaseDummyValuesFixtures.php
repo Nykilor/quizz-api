@@ -34,7 +34,12 @@ class DatabaseDummyValuesFixtures extends Fixture
         $admin_user = $this->getDummyUserEntity($manager, "root", true);
         $normal_user_1 = $this->getDummyUserEntity($manager, "user1");
         $normal_user_2 = $this->getDummyUserEntity($manager, "user2");
-        $persistence_array = [$admin_user, $normal_user_1, $normal_user_2];
+
+        $banned_user_3 = $this->getDummyUserEntity($manager, "user3");
+        $banned_user_3->setBannedTill(new DateTime("2030-09-11"));
+        $banned_user_3->setBanReason("I'm a twat");
+
+        $persistence_array = [$admin_user, $normal_user_1, $normal_user_2, $banned_user_3];
 
         $quiz1 = $this->getQuizWithQuestionsAnswers($manager, $admin_user);
         $quiz1[0]->setTitle("Test Admin Quiz!");
