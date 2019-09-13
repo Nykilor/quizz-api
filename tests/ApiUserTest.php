@@ -241,4 +241,19 @@ class ApiUserTest extends WebTestCase
 
       $this->assertEquals(403, $response->getStatusCode());
     }
+
+    public function testIfUsersTokenGetsDeactivatedAfterBan() : void
+    {
+      $headers = [
+        "Authorization" => "Bearer ".$this->getAuthToken("user2", "root")
+      ];
+
+      $response = $this->request("GET", $this->findOneIriBy(User::class, ["username" => "user2"])."/quizzes", null, $headers);
+      $this->assertEquals(200, $response->getStatusCode());
+
+      $this->testBanUser();
+
+      $response_banned = $this->request("GET", $this->findOneIriBy(User::class, ["username" => "user2"])."/quizzes", null, $headers);
+      $this->assertEquals(403, $response_banned->getStatusCode());
+    }
 }
